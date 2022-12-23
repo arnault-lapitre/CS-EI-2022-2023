@@ -1,0 +1,73 @@
+{
+   "type": "TESTCASE",
+
+   "variables": [
+      { "name": "WaitMax", "sort": "Real" },
+      { "name": "clk", "sort": "Real" },
+      { "name": "x", "sort": "Int" },
+      { "name": "y", "sort": "Real" }
+   ],
+
+   "testcase": {
+      "start": {
+         "guard": "(assert true)",
+         "action": { },
+
+         "verdict": "TOO_SHORT",
+         "state": "START",
+
+         "transitions": {
+            "stim_duration": [ { "name": "z_0", "sort": "Real" } ],
+            "observation": [
+               {
+                  "rule": "unauthorized reaction",
+
+                  "reset_clock": [ ],
+                  "guard": "(assert (and (= clk z_0) (< clk WaitMax)))",
+                  "action": {
+                     "direction": "INPUT",
+                     "channel": [ "coffee", "tea" ],
+                     "params": [ ]
+                  },
+
+                  "verdict": "FAIL_OUT",
+                  "state": "FAIL_OUT"
+               }
+            ],
+
+            "quiescence": [
+               {
+                  "rule": "unauthorized quiescence on bound",
+
+                  "reset_clock": [ ],
+                  "guard": "(assert (and (= clk z_0) (>= clk WaitMax)))",
+
+                  "verdict": "FAIL_TIME",
+                  "state": "FAIL_TIME"
+               }
+            ],
+
+            "stimulation": [
+               {
+                  "rule": "stimulation:",
+
+                  "reset_clock": [ "clk" ],
+                  "guard": "(assert (and (= clk z_0) (< clk WaitMax)))",
+                  "action": {
+                     "direction": "OUTPUT",
+                     "channel": "init",
+                     "params": [ ]
+                  },
+
+                  "verdict": "TOO_SHORT",
+                  "state": "INIT",
+
+                  "transitions": {
+                     
+                  }
+               }
+            ]
+         }
+      }
+   }
+}
