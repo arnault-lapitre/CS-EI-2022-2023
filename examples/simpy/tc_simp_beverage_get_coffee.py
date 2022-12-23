@@ -1,6 +1,7 @@
 from z3 import *
 import simpy.rt
 from time import perf_counter
+from time import perf_counter_ns
 from inputimeout import inputimeout
 
 def mk_var(typed_variables):
@@ -66,10 +67,10 @@ def tc_01(env):
         #WaitMax = 5 seconds maximum waiting time for observations
         # n.b, method inputimeout() takes timeout in seconds
         WaitMax = 10 
-        start = perf_counter()
+        start = perf_counter() #use instead perf_counter_ns() ns for nano seconds
         obs = inputimeout(prompt="beverage?\n", timeout=WaitMax)
         end = perf_counter()
-        obs_dur = end - start
+        obs_dur = end - start #get in nano seconds covert into milli seconds
         print('Duration to observation time unit: %.2f (in seconds)' % obs_dur)
         print('Observation :', obs)
         
@@ -87,7 +88,7 @@ def tc_01(env):
                     )
         """
         s_obs = Solver()
-        #To-Do add formula (z2 = obs_dur)
+        #To-Do add obs_dur (and obs) to formula (z2 = obs_dur) s.t int(obs_dur*1000)
         s_obs.from_string(formula_obs)
         print(s_obs) 
         vdt_sat = s_obs.check()
