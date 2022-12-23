@@ -23,13 +23,15 @@ def tc_01(env):
     # stim_val is the stimulus to apply
     # dur_val is the time to apply the stimulus
     s = Solver()
-    formula_stim = """(declare-const z_1 Real) (declare-const c_1 Int) (declare-const m_1 Int)
-                    (assert 
-                            (and (> z_1 0) 
-                                (and (= c_1 2) (> m_1 0)
-                                ) 
-                            )
-                    )
+    formula_stim = """
+        (declare-const z_1 Real) (declare-const c_1 Int) (declare-const m_1 Int)
+        (assert 
+            (and
+                (> z_1 0) 
+                (= c_1 2) 
+                (> m_1 0)
+            )
+        )
         """
     s.from_string(formula_stim)
     print(s)
@@ -43,10 +45,25 @@ def tc_01(env):
     
     model = s.model()
     print(model)
-    stim_val = model.evaluate(stim['c_1'])
+    stim_val = model[stim['c_1']]
     print('stim_val ->', stim_val)
-    stim_dur = model.evaluate(time['z_1'])
+    stim_dur = model[time['z_1']]
     print('stim_dur ->', stim_dur)
+
+    set_value_formula = """
+        (assert 
+                (and 
+                    (= z_1 {val_z1}) 
+                    (= c_1 {val_c1})
+                )
+        )
+        """.format(val_c1 =  model[stim['c_1']], val_z1 =  model[time['z_1']])
+
+    print( f"fix_value = {set_value_formula}" )
+
+    s.from_string(set_value_formula) # add solving model as assert constraint in the solver context
+    print(f"fix s = {s}")
+
     
     covert_stim_dur = stim_dur.as_long()*1000
     #get integer part of covert_stim_dur-sol_dur
@@ -75,17 +92,17 @@ def tc_01(env):
         print('Observation :', obs)
         
         formula_obs = "(assert true)"
-        formula_obs = """(declare-const z_1 Real) (declare-const z_2 Real) (declare-const c_1 Int)
-                    (assert 
-                            (and (> z_1 0) 
-                                (and (= c_1 2) 
-                                    (and (> z_2 0) 
-                                        (and (> z_2 2) (< z_2 10)
-                                        )
-                                    )
-                                )
-                            )
-                    )
+        formula_obs = """
+            (declare-const z_1 Real) (declare-const z_2 Real) (declare-const c_1 Int)
+            (assert 
+                (and 
+                    (> z_1 0) 
+                    (= c_1 2) 
+                    (> z_2 0) 
+                    (> z_2 2) 
+                    (< z_2 10)
+                )
+            )
         """
         s_obs = Solver()
         #To-Do add obs_dur (and obs) to formula (z2 = obs_dur) s.t int(obs_dur*1000)
